@@ -13,8 +13,21 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
+    - name: Configure AWS Credentials
+      env:
+        AWS_ACCESS_KEY_ID: ASIASZJXXTH6YQKM5SWJ
+        AWS_SECRET_ACCESS_KEY: WGo1Wj2FEyKqT//bZfIU7YEEa+M/Hf4Ge7hJYXFC
+        AWS_REGION: us-east-1
+      run: |
+        aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+        aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+        aws configure set region $AWS_REGION
+
     - name: Login to Amazon ECR
-      uses: aws-actions/amazon-ecr-login@v1
+      env:
+        AWS_REGION: us-east-1
+      run: |
+        aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com
 
     - name: Build and Tag Docker Image
       run: |
@@ -22,4 +35,4 @@ jobs:
 
     - name: Push Docker Image to Amazon ECR
       run: |
-        docker push 191779805693.dkr.ecr.us-east-1.amaonaws.com/webapp:latest
+        docker push 191779805693.dkr.ecr.us-east-1.amazonaws.com/webapp:latest
